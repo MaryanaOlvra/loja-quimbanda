@@ -1,30 +1,75 @@
 import React from 'react';
+import { Eye, Flame, Clock, Moon, MessageCircle } from 'lucide-react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-export function Home() {
+const Home = () => {
+  const servicos = [
+    { id: 1, nome: "CONSULTA VIDAS PASSADAS", preco: "307,00", icon: <Eye size={32} /> },
+    { id: 2, nome: "CONSULTA COMPLETA", preco: "247,00", icon: <Flame size={32} /> },
+    { id: 3, nome: "CONSULTA EMERGENCIAL", preco: "347,00", icon: <Clock size={32} /> },
+    { id: 4, nome: "CONSULTA POR ÁREA", preco: "147,00", icon: <Moon size={32} /> },
+  ];
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Seção Hero / Destaque */}
-      <section className="relative py-24 bg-gradient-to-b from-zinc-900 to-zinc-950 border-b border-amber-900/20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <span className="text-amber-500 uppercase tracking-widest text-xs font-semibold mb-4 block">
-            Tradição, Axé e Fundamento
-          </span>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-amber-100 mb-6 tracking-wide">
-            Artigos Consagrados da Quimbanda M'bande
-          </h1>
-          <p className="max-w-2xl mx-auto text-zinc-400 text-base md:text-lg mb-8 leading-relaxed">
-            Encontre artefatos sagrados preparados com rigor espiritual e excelência para o seu culto e proteção.
-          </p>
-          <div className="flex justify-center gap-4">
-            <button className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold px-8 py-3 rounded shadow-lg transition-all uppercase text-sm tracking-wider">
-              Ver Catálogo
-            </button>
-            <button className="border border-amber-700/60 hover:border-amber-500 text-amber-300 font-medium px-8 py-3 rounded transition-all uppercase text-sm tracking-wider">
-              Agendar Consulta
-            </button>
+    <div className="min-h-screen bg-[#050505] font-sans">
+      <Header />
+
+      {/* Seção de Serviços - Baseada no Protótipo */}
+      <main className="bg-[#3b0303] py-20 px-4 relative">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Título da Seção */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl text-white font-[Playfair_Display] tracking-wider mb-4">
+              SERVIÇOS <span className="text-[#c5a059] italic">ESPIRITUAIS</span>
+            </h2>
+            <div className="h-1 w-24 bg-[#c5a059] mx-auto rounded-full"></div>
+          </div>
+
+          {/* Grid de Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {servicos.map((servico) => (
+              <div key={servico.id} className="bg-white rounded-md p-8 flex flex-col items-center justify-between text-center shadow-2xl transform transition hover:-translate-y-1 hover:shadow-[#c5a059]/20">
+                
+                {/* Ícone Dourado */}
+                <div className="text-[#c5a059] mb-6">
+                  {servico.icon}
+                </div>
+
+                {/* Nome do Serviço */}
+                <h3 className="text-[#3b0303] font-bold text-sm tracking-widest uppercase mb-6 h-10 flex items-center justify-center">
+                  {servico.nome}
+                </h3>
+
+                {/* Preço */}
+                <div className="text-2xl font-[Playfair_Display] font-bold text-[#3b0303] mb-8">
+                  R$ {servico.preco}
+                </div>
+
+                {/* Botão */}
+                <button className="w-full border border-[#3b0303] text-[#3b0303] py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#3b0303] hover:text-white transition-colors duration-300">
+                  Saiba Mais
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* Botão Flutuante do WhatsApp */}
+        <a 
+          href="https://wa.me/5511999999999" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="fixed bottom-8 right-8 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform z-50 flex items-center justify-center"
+        >
+          <MessageCircle size={28} />
+        </a>
+      </main>
+
+      <Footer />
     </div>
   );
-}
+};
+
+export default Home;
