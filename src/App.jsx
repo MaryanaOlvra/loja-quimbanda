@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   ShoppingBag, MessageCircle, Menu, X, ChevronRight, ShieldCheck, 
   Eye, Sparkles, CreditCard, Smartphone, FileText, Trash2, Plus, 
-  Minus, Moon, Lock, Instagram, LayoutDashboard, Package, 
+  Minus, Moon, Lock, LayoutDashboard, Package, 
   Users, ShoppingCart, LogOut, ArrowLeft, ExternalLink, Play, CheckCircle,
   TrendingUp, AlertCircle, Clock, Search, MapPin, Truck, Sun, ChevronLeft,
   Heart, Filter, Star
@@ -23,7 +23,7 @@ const INITIAL_PRODUCTS = [
     price: 130.15,
     shortDesc: 'Frasco vermelho, atração e magnetismo do Cabaré.',
     description: 'Perfume ritualístico preparado sob a força da Pombagira Sete Saias. Fragrância de atração para elevar o magnetismo e o poder pessoal nas relações amorosas e interpessoais.',
-    image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=600', // Substitua pela imagem real do frasco de maçã vermelha
+    image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=600',
     category: 'Perfumes',
     stock: 62,
     status: 'disponível',
@@ -35,7 +35,7 @@ const INITIAL_PRODUCTS = [
     price: 101.65,
     shortDesc: 'Abertura real de caminhos financeiros.',
     description: 'Destrave total dos caminhos amorosos e materiais. Atração imediata de oportunidades, clientes e prosperidade. Frasco conta-gotas imantado.',
-    image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=600', // Substitua pela imagem real do óleo com moedas
+    image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=600',
     category: 'Óleos',
     stock: 10,
     status: 'disponível',
@@ -47,7 +47,7 @@ const INITIAL_PRODUCTS = [
     price: 130.15,
     shortDesc: 'Para mediunidade e força nos feitiços.',
     description: 'Pó consagrado para ampliar a sua força mágica, mediunidade e os resultados das suas firmezas. Item indispensável para quem pratica a verdadeira magia.',
-    image: 'https://images.unsplash.com/photo-1605152276897-4f618f831968?auto=format&fit=crop&q=80&w=600', // Substitua pela imagem do pote escuro
+    image: 'https://images.unsplash.com/photo-1605152276897-4f618f831968?auto=format&fit=crop&q=80&w=600',
     category: 'Pós',
     stock: 5,
     status: 'disponível',
@@ -58,8 +58,8 @@ const INITIAL_PRODUCTS = [
     name: 'Patuá de Proteção do Exu Cruzeiro',
     price: 82.65,
     shortDesc: 'Amuleto de proteção máxima contra demandas.',
-    description: 'Patuá cruzado nas forças do Exu Cruzeiro. Corte de inveja, neutralização de rivais e proteção profunda da sua coroa e caminhos.',
-    image: 'https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&q=80&w=600', // Substitua pela imagem dos patuás pretos com vermelho
+    description: 'Pó cruzado nas forças do Exu Cruzeiro. Corte de inveja, neutralização de rivais e proteção profunda da sua coroa e caminhos.',
+    image: 'https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&q=80&w=600',
     category: 'Amuletos',
     stock: 24,
     status: 'disponível',
@@ -71,7 +71,7 @@ const INITIAL_PRODUCTS = [
     price: 92.15,
     shortDesc: 'Ritual Mulheres de Pombagira.',
     description: 'Garrafa com o preparado líquido para o banho de ervas. Conexão profunda, limpeza energética e empoderamento feminino guiado pelas Pombagiras.',
-    image: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=600', // Substitua pela imagem da garrafa de banho
+    image: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=600',
     category: 'Banhos',
     stock: 0,
     status: 'esgotado',
@@ -134,8 +134,9 @@ const App = () => {
   const [shippingValue, setShippingValue] = useState(null);
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState('pix');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Navegação
   const navigate = (v, params = null) => {
     if (params) setSelectedProduct(params);
     setView(v);
@@ -143,7 +144,6 @@ const App = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Carrinho e Favoritos
   const addToCart = (p, qty = 1) => {
     const existing = cart.find(item => item.id === p.id);
     if (existing) setCart(cart.map(item => item.id === p.id ? { ...item, quantity: item.quantity + qty } : item));
@@ -166,6 +166,24 @@ const App = () => {
 
   const calculateShipping = () => { if (cep.length >= 8) setShippingValue(25.00); };
   const applyCoupon = () => { if (coupon.toUpperCase() === 'LIRA10') setDiscount(10); else alert('Cupom inválido.'); };
+  const handlePayment = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      navigate('success');
+      setCart([]);
+      setDiscount(0);
+      setShippingValue(null);
+    }, 2000);
+  };
+
+  const navigateService = (direction) => {
+    const currentIndex = services.findIndex(s => s.id === selectedProduct.id);
+    let nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+    if (nextIndex >= services.length) nextIndex = 0;
+    if (nextIndex < 0) nextIndex = services.length - 1;
+    setSelectedProduct(services[nextIndex]);
+  };
 
   const filteredProducts = activeCategory === 'Todos' ? products : products.filter(p => p.category === activeCategory);
 
@@ -288,7 +306,6 @@ const App = () => {
         </div>
         <div className="flex flex-col items-center sm:items-start gap-6">
           <div className="flex gap-6 text-[#c5a059]">
-            <div className="p-3 bg-white/5 rounded-full hover:bg-[#c5a059] hover:text-black transition-all cursor-pointer"><Instagram size={20}/></div>
             <div className="p-3 bg-white/5 rounded-full hover:bg-[#c5a059] hover:text-black transition-all cursor-pointer"><MessageCircle size={20}/></div>
           </div>
           <button onClick={() => navigate('admin-login')} className="text-[10px] uppercase font-bold text-white/40 hover:text-white mt-4">Painel Restrito</button>
@@ -302,12 +319,11 @@ const App = () => {
       case 'home':
         return (
           <div className="animate-in fade-in duration-700">
-            {/* Banner Principal - Foco no Slogan Real */}
             <section className="relative h-[85vh] md:h-[95vh] flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-[#4a0404]/30 to-transparent z-10" />
               <img src="https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&q=80&w=1600" className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 scale-105" alt="Altar" />
               <div className="relative z-20 text-center px-4 max-w-5xl flex flex-col items-center">
-                <div className="mb-6 md:mb-10 flex justify-center text-[#c5a059]"><Moon size={48} md:size={64} strokeWidth={1} className="animate-pulse" /></div>
+                <div className="mb-6 md:mb-10 flex justify-center text-[#c5a059]"><Moon size={64} strokeWidth={1} className="animate-pulse" /></div>
                 <h2 className="text-3xl md:text-7xl font-serif text-white mb-8 tracking-tight italic uppercase leading-tight drop-shadow-2xl">
                   Mameto <span className="text-[#c5a059]">M'bande</span>
                 </h2>
@@ -319,7 +335,6 @@ const App = () => {
               </div>
             </section>
 
-            {/* Destaques (Físicos) com Wishlist Simulado */}
             <section className={`py-20 md:py-32 px-4 md:px-6 ${theme.bg} transition-all`}>
               <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-16">
@@ -346,9 +361,7 @@ const App = () => {
                       <p className={`${theme.textMuted} text-[10px] mb-6 uppercase tracking-widest italic font-bold flex-grow line-clamp-2`}>{p.shortDesc}</p>
                       <div className="flex items-center justify-between border-t border-[#c5a059]/10 pt-6">
                         <p className={`${theme.text} font-serif text-2xl font-black`}>R$ {p.price.toFixed(2).replace('.', ',')}</p>
-                        <div className="flex gap-2">
-                           <Button onClick={() => addToCart(p)} variant="primary" className="px-4 py-3 shadow-md !w-auto" disabled={p.status === 'esgotado'}><ShoppingCart size={18}/></Button>
-                        </div>
+                        <Button onClick={() => addToCart(p)} variant="primary" className="px-4 py-3 shadow-md !w-auto" disabled={p.status === 'esgotado'}><ShoppingCart size={18}/></Button>
                       </div>
                     </div>
                   ))}
@@ -356,8 +369,7 @@ const App = () => {
               </div>
             </section>
 
-            {/* Hub de Rituais e Cursos */}
-            <section className={`py-20 md:py-32 px-4 md:px-6 ${isLightMode ? 'bg-[#4a0404] text-white' : 'bg-[#020202]'} border-y border-[#c5a059]/20`}>
+            <section className={`py-20 md:py-32 px-4 md:px-6 ${isLightMode ? 'bg-[#4a0404] text-white' : 'bg-[#020202]} border-y border-[#c5a059]/20`}>
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
                    <h2 className="text-4xl md:text-5xl font-serif italic text-white uppercase tracking-widest">Rituais & <span className="text-[#c5a059]">Consultas</span></h2>
@@ -388,7 +400,6 @@ const App = () => {
                   <div className={`w-24 h-[3px] ${isLightMode ? 'bg-[#4a0404]' : 'bg-[#c5a059]'} mx-auto mt-6`}></div>
                 </div>
 
-                {/* Filtro de Categorias Moderno */}
                 <div className="flex flex-wrap justify-center gap-4 mb-16">
                   {['Todos', 'Perfumes', 'Óleos', 'Pós', 'Amuletos', 'Banhos'].map(cat => (
                     <button 
@@ -405,7 +416,7 @@ const App = () => {
                    {filteredProducts.map(p => (
                       <div key={p.id} className={`${theme.card} p-6 rounded-sm group hover:-translate-y-2 transition-all flex flex-col`}>
                          <div className="relative h-72 overflow-hidden mb-6 cursor-pointer border border-[#c5a059]/10" onClick={() => navigate('details', p)}>
-                            <img src={p.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" />
+                            <img src={p.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" alt={p.name} />
                             <div className="absolute bottom-4 left-4 bg-black/80 px-3 py-1 rounded-full text-[8px] text-white uppercase font-bold tracking-widest border border-white/20">{p.sold} Vendidos</div>
                             {p.status === 'esgotado' && <div className="absolute inset-0 bg-black/80 flex items-center justify-center text-red-500 font-bold uppercase text-[10px] tracking-widest border border-red-500">Esgotado</div>}
                          </div>
@@ -440,49 +451,18 @@ const App = () => {
                   <h2 className={`text-4xl md:text-5xl font-serif mb-6 uppercase tracking-tight italic ${theme.text}`}>{item.name}</h2>
                   <div className="text-4xl font-black mb-8 font-serif text-[#c5a059]">R$ {item.price.toFixed(2).replace('.', ',')}</div>
                   
-                  {/* Descrição Melhorada em UI */}
                   <div className={`p-8 border-l-4 ${isLightMode ? 'border-[#4a0404] bg-[#4a0404]/5' : 'border-[#c5a059] bg-white/5'} mb-10 rounded-r-md`}>
                      <h3 className="font-bold uppercase text-[10px] tracking-widest mb-4">Sobre o Fundamento</h3>
                      <p className={`text-sm md:text-base leading-relaxed ${theme.textMuted}`}>{item.description}</p>
-                  </div>
-
-                  <div className="flex items-center gap-6 mb-10 text-[10px] font-bold uppercase tracking-widest border-y border-[#c5a059]/20 py-4">
-                     <span className={item.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                       {item.stock > 0 ? `✓ Em Stock (${item.stock} UN)` : '✗ Esgotado'}
-                     </span>
-                     <span className="text-gray-500">|</span>
-                     <span className="text-gray-500">🔥 {item.sold} já foram consagrados</span>
                   </div>
 
                   <div className="mt-auto flex flex-col sm:flex-row gap-4">
                     <Button onClick={() => addToCart(item)} variant="primary" className="flex-grow py-6 text-xs shadow-2xl" disabled={item.status === 'esgotado'}>
                       <ShoppingCart size={20}/> Adicionar ao Carrinho
                     </Button>
-                    <Button onClick={() => window.open(`https://wa.me/5511930027669?text=Dúvidas sobre o produto ${item.name}`, '_blank')} variant="outline" className="px-8 py-6">
-                      Dúvidas?
-                    </Button>
                   </div>
                 </div>
               </div>
-            </section>
-            
-            {/* Aba de Exploração Dinâmica (Apenas Físicos) */}
-            <section className={`py-20 md:py-32 px-4 md:px-6 border-t-4 ${isLightMode ? 'bg-[#4a0404] border-[#c5a059]' : 'bg-[#0a0a0a] border-[#c5a059]/10'}`}>
-               <div className="max-w-7xl mx-auto">
-                  <h3 className="text-[#c5a059] text-center font-serif text-3xl md:text-4xl mb-16 uppercase tracking-widest italic font-bold">Você pode <span className="text-white">Gostar</span></h3>
-                  <div className="relative overflow-x-auto pb-10 scrollbar-hide snap-x">
-                    <div className="flex gap-6 md:gap-10 w-max px-4">
-                      {products.filter(other => other.id !== item.id).map(prod => (
-                        <div key={prod.id} className={`w-72 p-6 ${isLightMode ? 'bg-white' : 'bg-[#111]'} border border-[#c5a059]/30 transition-all hover:-translate-y-2 shadow-xl snap-center rounded-sm`}>
-                          <img src={prod.image} className="w-full h-48 object-cover grayscale mb-6 rounded-sm" />
-                          <h4 className={`${isLightMode ? 'text-[#4a0404]' : 'text-white'} font-bold uppercase text-xs mb-3 text-center tracking-widest`}>{prod.name}</h4>
-                          <p className="text-[#c5a059] text-center font-serif font-black mb-6 text-xl">R$ {prod.price.toFixed(2).replace('.', ',')}</p>
-                          <Button onClick={() => navigate('details', prod)} variant={isLightMode ? 'primary' : 'outline'} className="w-full py-4 text-[9px]">Ver Detalhes</Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-               </div>
             </section>
           </div>
         );
@@ -521,7 +501,6 @@ const App = () => {
                 </div>
 
                 <div className={`${theme.card} p-8 md:p-16 text-center flex-grow relative overflow-hidden border-2 w-full rounded-md shadow-2xl`}>
-                   <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none text-[#c5a059]">{s.icon}</div>
                    <span className="inline-block px-4 py-1 border border-[#c5a059] text-[#c5a059] rounded-full text-[10px] font-bold uppercase tracking-widest mb-8">{s.type}</span>
                    <h2 className={`text-3xl md:text-6xl font-serif mb-8 italic uppercase tracking-tighter ${theme.text}`}>{s.name}</h2>
                    <div className={`text-3xl md:text-5xl font-black mb-12 ${theme.text}`}>R$ {s.price.toFixed(2).replace('.', ',')}</div>
@@ -533,12 +512,8 @@ const App = () => {
                    
                    <div className="mt-16 flex flex-col gap-4 max-w-md mx-auto">
                       <Button onClick={() => window.open(`https://wa.me/5511930027669?text=Desejo agendar: ${s.name}`, '_blank')} variant="primary" className="w-full py-6 text-xs bg-green-700 hover:bg-green-800 border-none shadow-[0_0_20px_rgba(21,128,61,0.4)]">
-                         <MessageCircle size={22}/> Agendar pelo WhatsApp
+                          <MessageCircle size={22}/> Agendar pelo WhatsApp
                       </Button>
-                      <div className="flex justify-between w-full md:hidden mt-4 gap-4">
-                        <Button onClick={() => navigateService('prev')} variant="outline" className="flex-grow py-4"><ChevronLeft size={20}/></Button>
-                        <Button onClick={() => navigateService('next')} variant="outline" className="flex-grow py-4"><ChevronRight size={20}/></Button>
-                      </div>
                    </div>
                 </div>
 
@@ -547,13 +522,6 @@ const App = () => {
                      <ChevronRight size={36} />
                   </button>
                 </div>
-             </div>
-             
-             {/* Indicadores de Carrossel */}
-             <div className="flex justify-center mt-12 gap-3">
-                {services.map((item) => (
-                  <div key={item.id} className={`w-2 h-2 rounded-full ${item.id === s.id ? 'bg-[#c5a059] w-8' : 'bg-gray-400'} transition-all`} />
-                ))}
              </div>
           </section>
         );
@@ -573,7 +541,7 @@ const App = () => {
                 <div className="lg:col-span-2 space-y-6 md:space-y-8">
                   {cart.map(i => (
                     <div key={i.id} className={`${theme.card} p-6 md:p-8 flex flex-col sm:flex-row items-center gap-8 rounded-md`}>
-                      <img src={i.image} className="w-24 h-24 object-cover grayscale rounded-sm border border-[#c5a059]/30" />
+                      <img src={i.image} className="w-24 h-24 object-cover grayscale rounded-sm border border-[#c5a059]/30" alt={i.name} />
                       <div className="flex-grow text-center sm:text-left">
                         <h4 className={`font-bold uppercase text-xs tracking-widest ${theme.text}`}>{i.name}</h4>
                         <p className={`text-[#c5a059] text-sm mt-2 font-bold`}>R$ {i.price.toFixed(2).replace('.', ',')}</p>
@@ -643,10 +611,7 @@ const App = () => {
                   {discount > 0 && <div className="flex justify-between text-green-600"><span>Desconto ({discount}%)</span> <span>- R$ {((subtotal + shippingValue) * (discount/100)).toFixed(2)}</span></div>}
                   <div className={`flex justify-between text-3xl font-serif font-black border-t border-[#c5a059]/20 pt-8 ${theme.text}`}><span>Total</span> <span className="text-[#c5a059]">R$ {total.toFixed(2)}</span></div>
                 </div>
-                <Button onClick={() => navigate('payment')} variant="primary" className="w-full py-6">Ir para Pagamento Segura</Button>
-                <div className="mt-6 flex items-center justify-center gap-2 text-[9px] text-gray-500 uppercase tracking-widest">
-                  <Lock size={12}/> Ambiente Criptografado
-                </div>
+                <Button onClick={() => navigate('payment')} variant="primary" className="w-full py-6">Ir para Pagamento Seguro</Button>
               </div>
             </div>
           </section>
@@ -687,7 +652,6 @@ const App = () => {
              <h2 className={`text-4xl md:text-5xl font-serif mb-6 italic ${theme.text}`}>Pedido Confirmado!</h2>
              <p className="text-[#c5a059] uppercase text-xs font-bold tracking-[0.3em] mb-12">O seu axé foi firmado na Lira.</p>
              <div className={`${theme.card} p-10 text-left mb-12 rounded-md relative overflow-hidden`}>
-                <div className="absolute -right-6 -top-6 opacity-5 pointer-events-none text-[#c5a059]"><TridentIcon size={150}/></div>
                 <div className="flex justify-between text-xs text-gray-500 uppercase mb-6 pb-4 border-b border-[#c5a059]/20 font-bold"><span>ID do Pedido</span> <span className={theme.text}>#QM-1099</span></div>
                 <div className="flex justify-between text-xs text-gray-500 uppercase mb-4 font-bold"><span>Status Inicial</span> <span className="text-yellow-600 italic">Em Preparação Ritualística</span></div>
                 <p className={`text-[10px] leading-relaxed mt-8 border-t border-[#c5a059]/20 pt-6 ${theme.textMuted} uppercase tracking-widest`}>O código de rastreamento será enviado em breve para o seu e-mail.</p>
@@ -696,7 +660,6 @@ const App = () => {
           </section>
         );
 
-      // --- ÁREA DA CLIENTE ---
       case 'login':
         return (
           <section className={`py-32 md:py-48 px-4 md:px-6 max-w-md mx-auto min-h-screen flex items-center justify-center ${theme.bg}`}>
@@ -706,45 +669,6 @@ const App = () => {
                   <Input label="E-mail" placeholder="seu@email.com" required />
                   <Input label="Palavra-passe" type="password" placeholder="******" required />
                   <Button variant="primary" className="w-full mt-4 py-5 shadow-xl">Entrar</Button>
-                  <div className="flex flex-col gap-4 text-[10px] uppercase tracking-widest font-bold text-center mt-8 pt-6 border-t border-[#c5a059]/20">
-                     <span className="cursor-pointer text-[#c5a059] hover:underline" onClick={() => navigate('register')}>Criar Novo Registro</span>
-                     <span className={`cursor-pointer ${theme.textMuted} hover:text-[#c5a059]`} onClick={() => navigate('forgot-password')}>Esqueci a Senha</span>
-                  </div>
-                </form>
-             </div>
-          </section>
-        );
-
-      case 'register':
-        return (
-          <section className={`py-32 md:py-48 px-4 md:px-6 max-w-md mx-auto min-h-screen flex items-center justify-center ${theme.bg}`}>
-             <div className={`${theme.card} p-8 md:p-12 w-full rounded-md`}>
-                <h2 className={`text-2xl font-serif text-center italic mb-10 uppercase tracking-widest ${theme.text}`}>Novo Registro</h2>
-                <form className="space-y-6" onSubmit={e => { e.preventDefault(); navigate('login'); }}>
-                  <Input label="Nome Completo" placeholder="Ex: Maria Joaquina" required />
-                  <Input label="E-mail" type="email" placeholder="seu@email.com" required />
-                  <Input label="Palavra-passe" type="password" placeholder="Crie uma senha" required />
-                  <Button variant="primary" className="w-full mt-4 py-5 shadow-xl">Criar Conta</Button>
-                  <div className="text-center mt-6">
-                    <span className={`cursor-pointer text-[10px] uppercase font-bold tracking-widest ${theme.textMuted} hover:text-[#c5a059]`} onClick={() => navigate('login')}>Já tenho conta</span>
-                  </div>
-                </form>
-             </div>
-          </section>
-        );
-
-      case 'forgot-password':
-        return (
-          <section className={`py-32 md:py-48 px-4 md:px-6 max-w-md mx-auto min-h-screen flex items-center justify-center ${theme.bg}`}>
-             <div className={`${theme.card} p-8 md:p-12 w-full rounded-md`}>
-                <h2 className={`text-2xl font-serif text-center italic mb-6 uppercase tracking-widest ${theme.text}`}>Recuperar</h2>
-                <p className={`text-[10px] uppercase tracking-widest text-center mb-8 font-bold ${theme.textMuted}`}>Insira seu e-mail para receber as instruções.</p>
-                <form className="space-y-6" onSubmit={e => { e.preventDefault(); alert('Instruções enviadas!'); navigate('login'); }}>
-                  <Input label="E-mail de Cadastro" type="email" placeholder="seu@email.com" required />
-                  <Button variant="primary" className="w-full mt-4 py-5 shadow-xl">Enviar Instruções</Button>
-                  <div className="text-center mt-6">
-                    <span className={`cursor-pointer text-[10px] uppercase font-bold tracking-widest ${theme.textMuted} hover:text-[#c5a059]`} onClick={() => navigate('login')}>Voltar ao Login</span>
-                  </div>
                 </form>
              </div>
           </section>
@@ -760,27 +684,6 @@ const App = () => {
                 </div>
                 <Button onClick={() => { setUser(null); navigate('home'); }} variant="outline" className="px-6 py-3"><LogOut size={16}/> Sair</Button>
              </div>
-             
-             <div className="space-y-6">
-                {[INITIAL_PRODUCTS[0], INITIAL_SERVICES[1]].map((item, idx) => (
-                  <div key={idx} className={`${theme.card} p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 rounded-md`}>
-                    <div className="flex items-center gap-6 w-full md:w-auto">
-                       <div className="w-16 h-16 bg-black/10 rounded-sm flex items-center justify-center text-[#c5a059] border border-[#c5a059]/20 shadow-inner">
-                         {item.type === 'physical' ? <Package size={24}/> : <Eye size={24}/>}
-                       </div>
-                       <div>
-                         <p className={`text-[9px] uppercase tracking-widest font-bold mb-1 ${theme.textMuted}`}>Pedido #109{idx}</p>
-                         <h4 className={`font-bold text-sm uppercase tracking-widest ${theme.text}`}>{item.name}</h4>
-                         <p className="text-xs text-[#c5a059] font-bold mt-1">R$ {item.price.toFixed(2)}</p>
-                       </div>
-                    </div>
-                    <div className="w-full md:w-auto flex flex-row md:flex-col justify-between items-center md:items-end gap-2 border-t md:border-none border-[#c5a059]/10 pt-4 md:pt-0">
-                       <span className="text-[10px] font-bold uppercase px-3 py-1 bg-green-900/10 text-green-600 rounded-full border border-green-600/20">Finalizado</span>
-                       {item.type === 'physical' && <button className="text-[9px] font-bold uppercase text-[#c5a059] hover:underline flex items-center gap-1">Rastrear <ExternalLink size={10}/></button>}
-                    </div>
-                  </div>
-                ))}
-             </div>
           </section>
         );
 
@@ -793,18 +696,11 @@ const App = () => {
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
                 <div className={`relative group p-4 border-2 ${isLightMode ? 'border-[#4a0404]' : 'border-[#c5a059]/20'} rounded-sm shadow-2xl overflow-hidden bg-black`}>
-                   <img src="https://images.unsplash.com/photo-1636113945952-4753549925e5?auto=format&fit=crop&q=80&w=800" className="w-full h-[450px] md:h-[650px] object-cover grayscale opacity-70 group-hover:grayscale-0 transition-all duration-1000" alt="7 Saias" />
-                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-white font-serif text-2xl uppercase tracking-widest drop-shadow-2xl">Laroyê</p>
-                   </div>
+                    <img src="https://images.unsplash.com/photo-1636113945952-4753549925e5?auto=format&fit=crop&q=80&w=800" className="w-full h-[450px] md:h-[650px] object-cover grayscale opacity-70" alt="7 Saias" />
                 </div>
                 <div className={`space-y-8 md:space-y-10 leading-relaxed text-center md:text-left ${theme.text}`}>
                    <p className="text-xl md:text-2xl font-serif italic">“Respeito, segredo e fundamentação quimbandeira.”</p>
-                   <p className={`text-sm md:text-base ${theme.textMuted}`}>A Quimbanda M’bande é um ponto de força ancestral no Reino da Lira. Não vendemos apenas itens ritualísticos; entregamos ferramentas de poder consagradas e imantadas.</p>
-                   <div className={`p-8 border-l-4 ${isLightMode ? 'border-[#4a0404] bg-[#4a0404]/5' : 'border-[#c5a059] bg-white/5'} rounded-r-md`}>
-                      <h4 className="font-bold uppercase text-[10px] tracking-widest mb-4">Fundamento Espiritual</h4>
-                      <p className={`italic text-sm ${theme.textMuted}`}>O nosso compromisso é com a verdade ritualística. Cada perfume é imantado em altar e cada orientação respeita o tempo das Entidades.</p>
-                   </div>
+                   <p className={`text-sm md:text-base ${theme.textMuted}`}>A Quimbanda M’bande é um ponto de força ancestral no Reino da Lira. Ferramentas de poder consagradas e imantadas.</p>
                    <Button onClick={() => navigate('home')} variant="outline" className="mx-auto md:mx-0"><ArrowLeft size={16}/> Retornar à Home</Button>
                 </div>
              </div>
@@ -831,8 +727,6 @@ const App = () => {
                 <div className="flex items-center gap-4 text-[#c5a059]"><TridentIcon className="w-8 h-8"/><span className="font-black uppercase text-xs tracking-widest">Gestão M'bande</span></div>
                 <nav className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
                    <button className="text-left text-[#c5a059] bg-[#c5a059]/10 p-4 rounded-sm flex items-center gap-3"><LayoutDashboard size={16}/> Dashboard</button>
-                   <button className="text-left hover:text-white p-4 flex items-center gap-3"><Package size={16}/> Produtos</button>
-                   <button className="text-left hover:text-white p-4 flex items-center gap-3"><ShoppingCart size={16}/> Pedidos</button>
                    <button onClick={() => { setIsAdmin(false); navigate('home'); }} className="text-left text-red-700 p-4 mt-10 flex items-center gap-3"><LogOut size={16}/> Sair do Painel</button>
                 </nav>
              </div>
@@ -846,17 +740,6 @@ const App = () => {
                          <div className={`text-3xl font-black ${stat.c || 'text-white'}`}>{stat.v}</div>
                       </div>
                    ))}
-                </div>
-                <div className="bg-[#0a0a0a] border border-[#c5a059]/20 p-8 rounded-sm">
-                   <h3 className="text-white font-black uppercase text-xs mb-8 tracking-widest flex items-center gap-2"><Search size={16} className="text-[#c5a059]"/> Atividade Recente</h3>
-                   <div className="space-y-4">
-                     <div className="flex justify-between p-4 border border-white/5 bg-black text-[10px] uppercase font-bold text-gray-400">
-                        <span>Maryana Oliveira realizou pedido #QM-1099</span><span className="text-[#c5a059]">R$ 134,90</span>
-                     </div>
-                     <div className="flex justify-between p-4 border border-white/5 bg-black text-[10px] uppercase font-bold text-gray-400">
-                        <span>Stock de 'Óleo da Prosperidade' esgotado</span><span className="text-red-500">Atenção</span>
-                     </div>
-                   </div>
                 </div>
              </div>
           </div>
