@@ -6,10 +6,8 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "#050505",
-        dourado: "#c5a059",
-        vinho: "#4a0404",
+      fontFamily: {
+        serif: ['"Playfair Display"', 'serif'], // <-- Isso garante a sua fonte favorita!
       }
     },
   },
